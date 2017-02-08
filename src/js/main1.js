@@ -124,21 +124,26 @@ define(function (require) {
     function makeShift(direction) {
         switch (direction){
             case 'ArrowRight':
-                for (var i = 2; i >= 0; i--) {  // cols
-                    for (var j = 0; j < 4; j++) { // rows
 
-                        if(gridCellsArray[i][j].value != 0)
+                // TODO: one cycle probably
+
+                for (var j = 0; j < 4; j++) { // rows
+                    for (var i = 2; i >= 0; i--) {  // cols   |0| <- |3|
+
+                        if(gridCellsArray[i][j].value != 0) // cell not empty
                         {
 
                             var positionToMove = -1;
                             var positionSameValue = -1;
 
-                            for (var k = i+1; k < 4; k++) {  //rows
+                            for (var k = i+1; k < 4; k++) {  // cols into current row   |i| -> |3|
 
                                 if (gridCellsArray[k][j].value == gridCellsArray[i][j].value &&
                                     positionSameValue == -1)
                                 {
                                     positionSameValue = k;
+                                    positionToMove = k;
+                                    break;
                                 }
 
                                 if (gridCellsArray[k][j].value == 0)
@@ -160,7 +165,7 @@ define(function (require) {
                             // concat:
                             if (positionSameValue != -1)
                             {
-                                console.log("► positionSameValue:",positionSameValue,", positionToMove:",positionToMove);
+                                //console.log("► positionSameValue:",positionSameValue,", positionToMove:",positionToMove);
 
                                 if (positionToMove != -1)
                                     concatEqualCells(i,j,positionSameValue,j,positionToMove,j)
@@ -173,10 +178,9 @@ define(function (require) {
                             // move:
                             if (positionToMove != -1)
                             {
+                                //console.log("► positionToMove:",positionToMove);
                                 moveCell(i,j,positionToMove,j);
                             }
-
-
 
                         }
                     }
@@ -185,28 +189,7 @@ define(function (require) {
                 break;
             case 'ArrowLeft':
 
-                /*for (var i = 1; i < 4; i++) {  // cols
-                    for (var j = 0; j < 4; j++) { // rows
 
-                        if(gridCellsArray[i][j].value !== 0)
-                        {
-
-                            var positionToMove;
-                            for (var k = i-1; k >= 0; k--) {  //rows
-
-
-                                if (gridCellsArray[k][j].value == 0)
-                                    positionToMove = k;
-                            }
-
-
-                            // swap:
-
-                            swapFromTo(i,j,positionToMove,j);
-
-                        }
-                    }
-                }*/
 
                 break;
             case 'ArrowUp':
@@ -241,7 +224,7 @@ define(function (require) {
                               secondCellCol, secondCellRow,
                               moveToCol, moveToRow) {
 
-        const value = gridCellsArray[firstCellCol][firstCellRow].value
+        const concatedValue = gridCellsArray[firstCellCol][firstCellRow].value * 2;
 
 
         if (moveToCol == undefined && moveToRow == undefined)
@@ -250,9 +233,9 @@ define(function (require) {
             moveToRow = secondCellRow;
         }
 
-        moveCell(firstCellCol, firstCellRow, moveToCol, moveToRow);
-        moveCell(secondCellCol, secondCellRow, moveToCol, moveToRow);
-
+        moveCell(firstCellCol, firstCellRow, moveToCol, moveToRow, true);
+        moveCell(secondCellCol, secondCellRow, moveToCol, moveToRow, true);
+        addCell(concatedValue,moveToCol,moveToRow);
 
 
         //addCell(value * 2, moveToCol, moveToRow);
@@ -261,13 +244,20 @@ define(function (require) {
 
     }
 
+    // row3
     addCell(4,0,2);
-    addCell(4,2,2);
+    addCell(8,1,2);
+    addCell(8,2,2);
+    addCell(4,3,2);
 
+
+    // row1
     addCell(2,1,0);
+
+    // row 4
     addCell(2,1,3);
 
-    function tempCompare(tempArray, celIdx){
+    function unitTestCompare(tempArray, celIdx){
 
         var positionToMove = -1;
         var positionSameValue = -1;
@@ -295,15 +285,14 @@ define(function (require) {
         }
 
         console.log("☼ array: ",tempArray);
-        console.log("► positionSameValue: ",positionSameValue,", positionToMove:",positionToMove,"\n \n \n _");
 
     }
 
-    /*tempCompare([2,0,0,2],0);
-    tempCompare([2,8,0,2],0);
-    tempCompare([0,2,8,2],1);
-    tempCompare([0,0,2,0],2);*/
-    tempCompare([0,2,2,0],1);
+    /*unitTestCompare([2,0,0,2],0);
+     unitTestCompare([2,8,0,2],0);
+     unitTestCompare([0,2,8,2],1);
+     unitTestCompare([0,0,2,0],2);
+     unitTestCompare([0,2,2,0],1);*/
 
     /*console.log("► start");
     for (var ii = 0; ii < 8; ii++) {  //rows
