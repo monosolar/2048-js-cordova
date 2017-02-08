@@ -121,23 +121,68 @@ define(function (require) {
 
     }
 
+    function shiftFingeringOperation(){
+
+    }
+
     function makeShift(direction) {
         switch (direction){
             case 'ArrowRight':
 
                 // TODO: one cycle probably
 
-                for (var j = 0; j < 4; j++) { // rows
-                    for (var i = 2; i >= 0; i--) {  // cols   |0| <- |3|
+                /*ar start, loop_cond, inc;
+                if(condition)
+                {
+                    start = 0;
+                    inc = 1;
+                    loop_cond_j = function(){return x < number};
+                }
+                else
+                {
+                    start = number - 1;
+                    inc = -1;
+                    loop_cond_i = function(){return x >= 0};
+                }
+                for(var x = start; loop_cond(); x += inc)
+                {
+                    // do something
+                }*/
 
+                var start_i = 2;
+                var inc_i = -1;
+                var loop_cond_i = function(){return i >= 0};
+
+                /*
+                var start_i = 1;
+                var inc_i = 1;
+                var loop_cond_i = function(){return i < 4};
+                */
+
+                var start_j = 0;
+                var inc_j = 1;
+                var loop_cond_j = function(){return j < 4};
+/*
+                var start_k = function(){return i-1};
+                var inc_k = -1;
+                var loop_cond_k = function(){return k >= 0};
+*/
+
+                var start_k = function(){return i+1};
+                var inc_k = 1;
+                var loop_cond_k = function(){return k <4};
+
+                for (var j = start_j; loop_cond_j(); j += inc_j) { // rows
+                    //for (var i = 2; i >= 0; i--) {  // cols   |0| <- |3|
+                    for (var i = start_i; loop_cond_i(); i += inc_i) {  // cols   |0| -> |3|
                         if(gridCellsArray[i][j].value != 0) // cell not empty
                         {
 
                             var positionToMove = -1;
                             var positionSameValue = -1;
 
-                            for (var k = i+1; k < 4; k++) {  // cols into current row   |i| -> |3|
-
+                            //for (var k = i+1; k < 4; k++) {  // cols into current row   |i| -> |3|
+                            for (var k = start_k(); loop_cond_k(); k += inc_k) {  // cols into current row   |i| <- |3|
                                 if (gridCellsArray[k][j].value == gridCellsArray[i][j].value &&
                                     positionSameValue == -1)
                                 {
@@ -145,19 +190,15 @@ define(function (require) {
                                     positionToMove = k;
                                     break;
                                 }
+                                else
 
                                 if (gridCellsArray[k][j].value == 0)
                                 {
                                     positionToMove = k;
                                 }
 
-
-                                // TODO: make one if
-                                if (gridCellsArray[k][j].value != 0 &&
-                                    gridCellsArray[k][j].value != gridCellsArray[i][j].value)
-                                {
+                                else
                                     break;
-                                }
 
                             }
 
@@ -165,8 +206,6 @@ define(function (require) {
                             // concat:
                             if (positionSameValue != -1)
                             {
-                                //console.log("► positionSameValue:",positionSameValue,", positionToMove:",positionToMove);
-
                                 if (positionToMove != -1)
                                     concatEqualCells(i,j,positionSameValue,j,positionToMove,j)
                                 else
@@ -178,7 +217,6 @@ define(function (require) {
                             // move:
                             if (positionToMove != -1)
                             {
-                                //console.log("► positionToMove:",positionToMove);
                                 moveCell(i,j,positionToMove,j);
                             }
 
@@ -252,10 +290,19 @@ define(function (require) {
 
 
     // row1
+    addCell(2,0,0);
     addCell(2,1,0);
+    addCell(16,2,0);
+    addCell(32,3,0);
+
 
     // row 4
+    addCell(2,0,3);
     addCell(2,1,3);
+    //addCell(2,2,3);
+    addCell(2,3,3);
+
+
 
     function unitTestCompare(tempArray, celIdx){
 
