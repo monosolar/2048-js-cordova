@@ -115,127 +115,125 @@ define(function (require) {
         cellContainer.addChild(cellGraphics);
         cellContainer.addChild(richText);
 
-        cellContainer.fedor = "ыыы";
-
         gridContainer.addChild(cellContainer);
 
     }
 
-    function shiftFingeringOperation(){
+    function shiftFingeringOperation( start_i, inc_i, loop_cond_i,
+                                      start_j, inc_j, loop_cond_j,
+                                      start_k, inc_k, loop_cond_k )
+    {
 
+        for (var j = start_j; loop_cond_j(j); j += inc_j) { // rows
+
+            //for (var i = 2; i >= 0; i--) {  // cols   |0| <- |3|
+            for (var i = start_i; loop_cond_i(i); i += inc_i) {
+
+                if(gridCellsArray[i][j].value != 0) // cell not empty
+                {
+
+                    var positionToMove = -1;
+                    var positionSameValue = -1;
+
+                    //for (var k = i+1; k < 4; k++) {  // cols into current row   |i| -> |3|
+                    for ( var k = start_k(i); loop_cond_k(k); k += inc_k ) {  // cols into current row   |i| <- |3|
+                        if (gridCellsArray[k][j].value == gridCellsArray[i][j].value &&
+                            positionSameValue == -1)
+                        {
+                            positionSameValue = k;
+                            positionToMove = k;
+                            break;
+                        }
+                        else
+
+                        if (gridCellsArray[k][j].value == 0)
+                        {
+                            positionToMove = k;
+                        }
+
+                        else
+                            break;
+                    }
+
+                    // concat:
+                    if (positionSameValue != -1)
+                    {
+                        if (positionToMove != -1)
+                            concatEqualCells(i,j,positionSameValue,j,positionToMove,j)
+                        else
+                            concatEqualCells(i,j,positionSameValue,j);
+                    }
+                    else
+                    // move:
+                    if (positionToMove != -1)
+                    {
+                        moveCell(i,j,positionToMove,j);
+                    }
+
+                }
+            }
+        }
     }
 
     function makeShift(direction) {
+
+        if (['ArrowRight','ArrowLeft','ArrowUp','ArrowDown'].indexOf(direction) == -1)
+            return;
+
+        var start_i;
+        var inc_i;
+        var loop_cond_i;
+
+        var start_j;
+        var inc_j;
+        var loop_cond_j;
+
+        var start_k;
+        var inc_k;
+        var loop_cond_k;
+
         switch (direction){
             case 'ArrowRight':
 
-                // TODO: one cycle probably
+                start_i = 2;
+                inc_i = -1;
+                loop_cond_i = function(i){ return i >= 0};
 
-                /*ar start, loop_cond, inc;
-                if(condition)
-                {
-                    start = 0;
-                    inc = 1;
-                    loop_cond_j = function(){return x < number};
-                }
-                else
-                {
-                    start = number - 1;
-                    inc = -1;
-                    loop_cond_i = function(){return x >= 0};
-                }
-                for(var x = start; loop_cond(); x += inc)
-                {
-                    // do something
-                }*/
+                start_j = 0;
+                inc_j = 1;
+                loop_cond_j = function(j){ return j < 4};
 
-                var start_i = 2;
-                var inc_i = -1;
-                var loop_cond_i = function(){return i >= 0};
-
-                /*
-                var start_i = 1;
-                var inc_i = 1;
-                var loop_cond_i = function(){return i < 4};
-                */
-
-                var start_j = 0;
-                var inc_j = 1;
-                var loop_cond_j = function(){return j < 4};
-/*
-                var start_k = function(){return i-1};
-                var inc_k = -1;
-                var loop_cond_k = function(){return k >= 0};
-*/
-
-                var start_k = function(){return i+1};
-                var inc_k = 1;
-                var loop_cond_k = function(){return k <4};
-
-                for (var j = start_j; loop_cond_j(); j += inc_j) { // rows
-                    //for (var i = 2; i >= 0; i--) {  // cols   |0| <- |3|
-                    for (var i = start_i; loop_cond_i(); i += inc_i) {  // cols   |0| -> |3|
-                        if(gridCellsArray[i][j].value != 0) // cell not empty
-                        {
-
-                            var positionToMove = -1;
-                            var positionSameValue = -1;
-
-                            //for (var k = i+1; k < 4; k++) {  // cols into current row   |i| -> |3|
-                            for (var k = start_k(); loop_cond_k(); k += inc_k) {  // cols into current row   |i| <- |3|
-                                if (gridCellsArray[k][j].value == gridCellsArray[i][j].value &&
-                                    positionSameValue == -1)
-                                {
-                                    positionSameValue = k;
-                                    positionToMove = k;
-                                    break;
-                                }
-                                else
-
-                                if (gridCellsArray[k][j].value == 0)
-                                {
-                                    positionToMove = k;
-                                }
-
-                                else
-                                    break;
-
-                            }
-
-
-                            // concat:
-                            if (positionSameValue != -1)
-                            {
-                                if (positionToMove != -1)
-                                    concatEqualCells(i,j,positionSameValue,j,positionToMove,j)
-                                else
-                                    concatEqualCells(i,j,positionSameValue,j);
-                            }
-
-                            else
-
-                            // move:
-                            if (positionToMove != -1)
-                            {
-                                moveCell(i,j,positionToMove,j);
-                            }
-
-                        }
-                    }
-                }
+                start_k = function(i){return i+1};
+                inc_k = 1;
+                loop_cond_k = function(k){return k <4};
 
                 break;
             case 'ArrowLeft':
 
+                start_i = 1;
+                inc_i = 1;
+                loop_cond_i = function(i){return i < 4};
 
+                start_j = 0;
+                inc_j = 1;
+                loop_cond_j = function(j){ return j < 4};
+
+                start_k = function(i){return i-1};
+                inc_k = -1;
+                loop_cond_k = function(k){return k >= 0};
 
                 break;
+
             case 'ArrowUp':
                 break;
             case 'ArrowDown':
                 console.log("►",event);
                 break;
         }
+
+        shiftFingeringOperation( start_i, inc_i, loop_cond_i,
+                                 start_j, inc_j, loop_cond_j,
+                                 start_k, inc_k, loop_cond_k )
     }
 
     function moveCell(fromCol, fromRow, toCol, toRow, deleteAfter) {
