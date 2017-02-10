@@ -2,9 +2,11 @@ define(function (require) {
     /** TODO:
      - Provide here CSS
      - Make ES6 classes
+     - Make rows and cols amount dynamically
      - Connect Ease JS
      - Make linear array
      - Cells graphic to aanchor
+     - Delete notEmptyCellsArray
     */
 
     const HORIZONTAL = 'HORIZONTAL';
@@ -46,6 +48,7 @@ define(function (require) {
     gridContainer.addChild(gridBGGraphics);
 
     const gridCellsArray = [];
+    const notEmptyCellsArray = [];
 
     var gridTileBGGraphics;
 
@@ -113,6 +116,8 @@ define(function (require) {
         gridCellsArray[row][col].value = value;
         gridCellsArray[row][col].cell = cellContainer;
 
+        notEmptyCellsArray.push({i:row,j:col});
+
         cellContainer.addChild(cellGraphics);
         cellContainer.addChild(richText);
 
@@ -127,7 +132,6 @@ define(function (require) {
         var direct = (start_i == 0) ? VERTICAL : HORIZONTAL;
 
         for (var j = start_j; loop_cond_j(j); j += inc_j) {
-
             for (var i = start_i; loop_cond_i(i); i += inc_i) {
 
                 if(gridCellsArray[i][j].value != 0)
@@ -182,14 +186,6 @@ define(function (require) {
                 }
             }
         }
-    }
-
-    function getDirectValue(direction, value) {
-        if (direction == HORIZONTAL)
-            return -1;
-        else
-            return value;
-
     }
 
     function makeShift(direction) {
@@ -279,7 +275,36 @@ define(function (require) {
         shiftFingeringOperation( start_i, inc_i, loop_cond_i,
                                  start_j, inc_j, loop_cond_j,
                                  start_k, inc_k, loop_cond_k )
+
+        turnAddCells();
     }
+
+    function turnAddCells() {
+
+        const amount = Math.random() > 0.5 ? 1 : 2;
+        const emptyCellsArray = [];
+
+        for (var i = 0; i<4; i++)
+            for (var j = 0; j<4; j++)
+                if (gridCellsArray[i][j].value == 0)
+                    emptyCellsArray.push({i:i, j:j});
+
+        if (emptyCellsArray.length == 0) return; // END OF GAME!!!!!!!
+
+        for (i = 0; i < amount; i++)
+        {
+            const randomIdx = parseInt(Math.random()*emptyCellsArray.length);
+
+            const valueToAdd = Math.random() > 0.5 ? 2 : 4;
+
+            addCell(valueToAdd,emptyCellsArray[randomIdx].i,emptyCellsArray[randomIdx].j)
+
+            emptyCellsArray.splice(randomIdx,1);
+        }
+
+    }
+
+
 
     function moveCell(fromCol, fromRow, toCol, toRow, deleteAfter) {
 
@@ -295,10 +320,14 @@ define(function (require) {
         {
             gridCellsArray[toCol][toRow].cell = gridCellsArray[fromCol][fromRow].cell;
             gridCellsArray[toCol][toRow].value = gridCellsArray[fromCol][fromRow].value;
+
+            notEmptyCellsArray.push({i:toCol,j:toRow});
         }
 
         gridCellsArray[fromCol][fromRow].cell = null;
         gridCellsArray[fromCol][fromRow].value = 0;
+
+        notEmptyCellsArray.slice(notEmptyCellsArray.indexOf({}))
     }
 
     function concatEqualCells(firstCellCol, firstCellRow,
@@ -318,14 +347,9 @@ define(function (require) {
         moveCell(secondCellCol, secondCellRow, moveToCol, moveToRow, true);
         addCell(concatedValue,moveToCol,moveToRow);
 
-
-        //addCell(value * 2, moveToCol, moveToRow);
-
-        // console.log("► con",firstCellCol, firstCellRow, secondCellCol, secondCellRow);
-
     }
 
-    // row3
+    /*// row3
     addCell(4,0,2);
     addCell(8,1,2);
     addCell(8,2,2);
@@ -343,53 +367,11 @@ define(function (require) {
     addCell(2,0,3);
     addCell(2,1,3);
     //addCell(2,2,3);
-    addCell(2,3,3);
+    addCell(2,3,3);*/
+
+    turnAddCells();
 
 
-
-    function unitTestCompare(tempArray, celIdx){
-
-        var positionToMove = -1;
-        var positionSameValue = -1;
-
-        for (var k = celIdx+1; k < 4; k++) {  //rows
-
-            if (tempArray[k] == tempArray[celIdx] &&
-                positionSameValue == -1)
-            {
-                positionSameValue = k;
-            }
-
-            if (tempArray[k] == 0)
-            {
-                positionToMove = k;
-            }
-
-
-            // TODO: make one if
-            if (tempArray[k] != 0 &&
-                tempArray[k] !== tempArray[celIdx])
-            {
-                break;
-            }
-        }
-
-        console.log("☼ array: ",tempArray);
-
-    }
-
-    /*unitTestCompare([2,0,0,2],0);
-     unitTestCompare([2,8,0,2],0);
-     unitTestCompare([0,2,8,2],1);
-     unitTestCompare([0,0,2,0],2);
-     unitTestCompare([0,2,2,0],1);*/
-
-    /*console.log("► start");
-    for (var ii = 0; ii < 8; ii++) {  //rows
-        console.log("► iteration ",ii);
-        if (ii === 5) break;
-    }
-    console.log("► finish");*/
 
     animate();
 
