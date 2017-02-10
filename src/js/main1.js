@@ -6,6 +6,10 @@ define(function (require) {
      - Make linear array
      - Cells graphic to aanchor
     */
+
+    const HORIZONTAL = 'HORIZONTAL';
+    const VERTICAL = 'VERTICAL';
+
     const PIXI = require('libs/pixi.min');
 
     const domDivContainer = document.getElementById("pixiDiv");
@@ -48,7 +52,6 @@ define(function (require) {
     for (var i = 0; i < 4; i++){
         gridCellsArray.push([]);
         for (var j = 0; j< 4; j++){
-            //gridPositionsArray[i][j] =
 
             const gap = 10;
             const cellSize = (500/4) - gap*1.33;
@@ -61,8 +64,6 @@ define(function (require) {
 
             gridTileBGGraphics.x = gap + (cellSize+gap) * i;
             gridTileBGGraphics.y = gap + (cellSize+gap) * j;
-
-            new PIXI.Point(gridTileBGGraphics.x,gridTileBGGraphics.y)
 
             gridCellsArray[i][j] =
                 {
@@ -123,21 +124,25 @@ define(function (require) {
                                       start_j, inc_j, loop_cond_j,
                                       start_k, inc_k, loop_cond_k )
     {
+        var direct = (start_i == 0) ? VERTICAL : HORIZONTAL;
 
-        for (var j = start_j; loop_cond_j(j); j += inc_j) { // rows
+        for (var j = start_j; loop_cond_j(j); j += inc_j) {
 
-            //for (var i = 2; i >= 0; i--) {  // cols   |0| <- |3|
             for (var i = start_i; loop_cond_i(i); i += inc_i) {
 
-                if(gridCellsArray[i][j].value != 0) // cell not empty
+                if(gridCellsArray[i][j].value != 0)
                 {
 
                     var positionToMove = -1;
                     var positionSameValue = -1;
 
-                    //for (var k = i+1; k < 4; k++) {  // cols into current row   |i| -> |3|
-                    for ( var k = start_k(i); loop_cond_k(k); k += inc_k ) {  // cols into current row   |i| <- |3|
-                        if (gridCellsArray[k][j].value == gridCellsArray[i][j].value &&
+                    const d_inc = (direct == HORIZONTAL) ? i : j;
+
+                    for ( var k = start_k(d_inc); loop_cond_k(k); k += inc_k ) {
+
+                        const k_cell = (direct == HORIZONTAL) ? gridCellsArray[k][j] : gridCellsArray[i][k];
+
+                        if (k_cell.value == gridCellsArray[i][j].value &&
                             positionSameValue == -1)
                         {
                             positionSameValue = k;
@@ -146,7 +151,7 @@ define(function (require) {
                         }
                         else
 
-                        if (gridCellsArray[k][j].value == 0)
+                        if (k_cell.value == 0)
                         {
                             positionToMove = k;
                         }
@@ -155,24 +160,36 @@ define(function (require) {
                             break;
                     }
 
+                    const positionSameValueDualArray = (direct == HORIZONTAL) ? [positionSameValue,j] :  [i,positionSameValue] ;
+                    const positionToMoveDualArray = (direct == HORIZONTAL) ? [positionToMove,j] : [i,positionToMove] ;
+
                     // concat:
                     if (positionSameValue != -1)
                     {
                         if (positionToMove != -1)
-                            concatEqualCells(i,j,positionSameValue,j,positionToMove,j)
+                            concatEqualCells(i,j,positionSameValueDualArray[0],positionSameValueDualArray[1],
+                                                 positionToMoveDualArray[0],positionToMoveDualArray[1])
                         else
-                            concatEqualCells(i,j,positionSameValue,j);
+                            concatEqualCells(i,j,positionSameValueDualArray[0],positionSameValueDualArray[1]);
                     }
                     else
                     // move:
                     if (positionToMove != -1)
                     {
-                        moveCell(i,j,positionToMove,j);
+                        moveCell(i,j,positionToMoveDualArray[0],positionToMoveDualArray[1]);
                     }
 
                 }
             }
         }
+    }
+
+    function getDirectValue(direction, value) {
+        if (direction == HORIZONTAL)
+            return -1;
+        else
+            return value;
+
     }
 
     function makeShift(direction) {
@@ -193,6 +210,7 @@ define(function (require) {
         var loop_cond_k;
 
         switch (direction){
+
             case 'ArrowRight':
 
                 start_i = 2;
@@ -208,6 +226,7 @@ define(function (require) {
                 loop_cond_k = function(k){return k <4};
 
                 break;
+
             case 'ArrowLeft':
 
                 start_i = 1;
@@ -225,9 +244,35 @@ define(function (require) {
                 break;
 
             case 'ArrowUp':
+
+                start_j = 1;
+                inc_j = 1;
+                loop_cond_j = function(j){return j < 4};
+
+                start_i = 0;
+                inc_i = 1;
+                loop_cond_i = function(i){ return i < 4};
+
+                start_k = function(j){return j-1};
+                inc_k = -1;
+                loop_cond_k = function(k){return k >= 0};
+
                 break;
+
             case 'ArrowDown':
-                console.log("►",event);
+
+                start_j = 2;
+                inc_j = -1;
+                loop_cond_j = function(j){ return j >= 0};
+
+                start_i = 0;
+                inc_i = 1;
+                loop_cond_i = function(i){ return i < 4};
+
+                start_k = function(i){return i+1};
+                inc_k = 1;
+                loop_cond_k = function(k){return k <4};
+
                 break;
         }
 
