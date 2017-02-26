@@ -1,19 +1,20 @@
 define(function () {
-    function testClass() {
+
+
+    var tt = {rr:66, oo:99}
+
+    function testClassRet() {
+        return tt;
     }
 
-    testClass.prototype = {
+    testClassRet.prototype = {
         setBreak: function (message) {
             console.log("►", message);
         }
 
     };
 
-    return new testClass();
+    return testClassRet();
 });
 
-/*define(['./Base'], function (Base) {
-    var c1 = new Base('Controller 1');
-    return c1;
-});*/
 

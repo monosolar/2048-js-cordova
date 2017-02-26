@@ -4,6 +4,8 @@ define(function (require) {
 
     var testClass = require('./TestClass');
 
+    var testClassRet = require('./TestClassReturn');
+
     var pcKeys = require('./pcKeybindings');
     var gameScene = require('./pixiGameScene');
 

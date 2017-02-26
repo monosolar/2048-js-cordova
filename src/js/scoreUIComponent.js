@@ -2,6 +2,9 @@ define(function (require) {
 
     const PIXI = require('libs/pixi.min');
 
+    const scoreComponentWidth = 120;
+    const scoreComponentHeight = 70;
+
     var scoreComponentValueRichText;
 
     var init = function () {
@@ -13,11 +16,7 @@ define(function (require) {
 
         /// → Score component:
         const scoreComponent = new PIXI.Container();
-        const scoreComponentWidth = 120;
-        const scoreComponentHeight = 70;
-
-        scoreComponent.x = gridSize - scoreComponentWidth;
-
+        
         const scoreComponentBGGraphic = new PIXI.Graphics();
         scoreComponentBGGraphic.beginFill(0xBBADA0);
         scoreComponentBGGraphic.drawRoundedRect(0, 0, scoreComponentWidth, scoreComponentHeight, 6);
@@ -39,15 +38,23 @@ define(function (require) {
         scoreComponentValueRichText.y = scoreComponentHeight/3 * 2;
         scoreComponent.addChild(scoreComponentValueRichText);
 
-        return scoreComponent
+        return scoreComponent;
     }
 
     scoreUIComponent.prototype = {
         increaseScore: function () {
-            scoreComponentValueRichText.textContent = 6;
+            //scoreComponentValueRichText.textContent = 6;
+            console.log("►ind");
+        },
+        getWidth: function () {
+            console.log("►gtw");
+            //return scoreComponentWidth;
+        },
+        getHeight: function () {
+            return scoreComponentHeight;
         }
     };
 
-    return scoreUIComponent();
+    return new scoreUIComponent();
 
 });

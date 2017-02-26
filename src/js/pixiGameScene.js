@@ -79,7 +79,7 @@ define(function (require) {
         topUIContainer.addChild(labelRichText);
 
         /// → Score component:
-        const scoreComponent = new PIXI.Container();
+        /*const scoreComponent = new PIXI.Container();
         const scoreComponentWidth = 120;
         const scoreComponentHeight = 70;
 
@@ -104,7 +104,12 @@ define(function (require) {
         scoreComponentValueRichText.anchor.set(0.5, 0.5);
         scoreComponentValueRichText.x = scoreComponentWidth/2;
         scoreComponentValueRichText.y = scoreComponentHeight/3 * 2;
-        scoreComponent.addChild(scoreComponentValueRichText);
+        scoreComponent.addChild(scoreComponentValueRichText);*/
+
+        const scoreComponent = require('./scoreUIComponent');
+
+        console.log("► sss", scoreComponent.getWidth());
+        //scoreComponent.x = gridSize - ;
 
         topUIContainer.addChild(scoreComponent);
 
